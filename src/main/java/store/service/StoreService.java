@@ -17,12 +17,7 @@ public class StoreService {
     private static final String NOT_PROMOTION = "null";
     private static final String BASIC = "basic";
 
-    public void init() {
-        initProducts();
-        initPromotions();
-    }
-
-    private void initProducts() {
+    public List<Product> initProducts() {
         try (BufferedReader reader = new BufferedReader(new FileReader(PRODUCT_FILE_PATH))) {
             String line = reader.readLine(); // 첫 번째 라인 사용 X
             while ((line = reader.readLine()) != null) {
@@ -36,6 +31,7 @@ public class StoreService {
                 }
                 addProduct(name, price, quantity, promotion);
             }
+            return ProductRepository.products();
         } catch (Exception e) {
             throw new IllegalStateException(CAN_NOT_LOAD_FILE);
         }
@@ -52,7 +48,7 @@ public class StoreService {
         product.addQuantity(promotion, quantity);
     }
 
-    private void initPromotions() {
+    public List<Promotion> initPromotions() {
         try (BufferedReader reader = new BufferedReader(new FileReader(PROMOTION_FILE_PATH))) {
             String line = reader.readLine(); // 첫 번째 라인 사용 X
             while ((line = reader.readLine()) != null) {
@@ -64,6 +60,7 @@ public class StoreService {
                 String endDate = items.get(4);
                 PromotionRepository.addPromotion(new Promotion(name, buy, get, startDate, endDate));
             }
+            return PromotionRepository.promotions();
         } catch (Exception e) {
             throw new IllegalStateException(CAN_NOT_LOAD_FILE);
         }
