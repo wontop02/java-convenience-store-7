@@ -1,9 +1,12 @@
 package store.controller;
 
 import java.util.List;
+import java.util.Map;
 import store.domain.Product;
 import store.domain.Promotion;
 import store.service.StoreService;
+import store.util.InputValidator;
+import store.view.InputView;
 import store.view.OutputView;
 
 public class StoreController {
@@ -19,6 +22,7 @@ public class StoreController {
         List<Product> products = storeService.initProducts();
         List<Promotion> promotions = storeService.initPromotions();
         printProducts(products, promotions);
+        Map<String, Integer> order = makeOrder();
     }
 
     private void printProducts(List<Product> products, List<Promotion> promotions) {
@@ -33,6 +37,18 @@ public class StoreController {
                 }
             }
             OutputView.printProducts(product.getName(), product.getPrice(), product.getQuantity(BASIC), "");
+        }
+    }
+
+    private Map<String, Integer> makeOrder() {
+        while (true) {
+            try {
+                String input = InputView.requestProduct();
+                InputValidator.validateProductInput(input);
+                return storeService.makeOrder(input);
+            } catch (IllegalArgumentException e) {
+                OutputView.printErrorMessage(e.getMessage());
+            }
         }
     }
 }

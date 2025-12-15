@@ -7,8 +7,6 @@ import java.util.Objects;
 import store.domain.Product;
 
 public class ProductRepository {
-    private static final String NOT_FOUND_PRODUCT = "해당 상품을 찾을 수 없습니다.";
-
     private static final List<Product> products = new ArrayList<>();
 
     public static List<Product> products() {

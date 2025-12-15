@@ -28,4 +28,10 @@ public class Product {
     public Integer getQuantity(String promotion) {
         return quantity.get(promotion);
     }
+
+    public int getTotalQuantity() {
+        return quantity.values().stream()
+                .mapToInt(Integer::intValue)
+                .sum();
+    }
 }
