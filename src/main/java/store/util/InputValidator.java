@@ -1,6 +1,7 @@
 package store.util;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -12,11 +13,13 @@ public class InputValidator {
 
     public static void validateProductInput(String input) {
         List<String> inputs = Arrays.asList(input.split(",", -1));
+        List<String> names = new ArrayList<>();
         for (String format : inputs) {
             format = format.replaceAll(ELIMINATE_FORMAT, "");
             if (!format.matches(PRODUCT_FORMAT)) {
                 throw new IllegalArgumentException(INVALID_FORMAT);
             }
+            validateDuplicate(names, format);
             String quantity = Arrays.asList(format.split("-", -1)).get(1);
             validateWithinIntRange(quantity);
             validatePositive(quantity);
@@ -36,5 +39,13 @@ public class InputValidator {
         if (quantity < 1) {
             throw new IllegalArgumentException(INVALID_INPUT);
         }
+    }
+
+    private static void validateDuplicate(List<String> names, String format) {
+        String name = Arrays.asList(format.split("-", -1)).get(0);
+        if (names.contains(name)) {
+            throw new IllegalArgumentException(INVALID_INPUT);
+        }
+        names.add(name);
     }
 }
