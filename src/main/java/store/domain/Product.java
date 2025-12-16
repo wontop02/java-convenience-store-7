@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Product {
+    private static final String BASIC = "basic";
+
     private final String name;
     private final int price;
     private final Map<String, Integer> quantity = new HashMap<>();
@@ -13,7 +15,7 @@ public class Product {
         this.price = price;
     }
 
-    public void addQuantity(String promotion, Integer quantity) {
+    public void updateQuantity(String promotion, Integer quantity) {
         this.quantity.put(promotion, quantity);
     }
 
@@ -33,5 +35,17 @@ public class Product {
         return quantity.values().stream()
                 .mapToInt(Integer::intValue)
                 .sum();
+    }
+
+    public Map<String, Integer> quantity() {
+        return Map.copyOf(quantity);
+    }
+
+
+    public String getPromotionName() {
+        return quantity.keySet().stream()
+                .filter(k -> !k.equals(BASIC))
+                .findAny()
+                .orElse(null);
     }
 }

@@ -1,9 +1,12 @@
 package store.service;
 
+import camp.nextstep.edu.missionutils.DateTimes;
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import store.domain.Product;
@@ -45,12 +48,12 @@ public class StoreService {
     private void addProduct(String name, int price, int quantity, String promotion) {
         if (ProductRepository.findByName(name) != null) {
             Product product = ProductRepository.findByName(name);
-            product.addQuantity(promotion, quantity);
+            product.updateQuantity(promotion, quantity);
             return;
         }
         Product product = new Product(name, price);
         ProductRepository.addProduct(product);
-        product.addQuantity(promotion, quantity);
+        product.updateQuantity(promotion, quantity);
     }
 
     public List<Promotion> initPromotions() {
@@ -72,7 +75,7 @@ public class StoreService {
     }
 
     public Map<String, Integer> makeOrder(String input) {
-        Map<String, Integer> order = new HashMap<>();
+        Map<String, Integer> order = new LinkedHashMap<>();
         List<String> inputs = Arrays.asList(input.split(",", -1));
         for (String productItems : inputs) {
             productItems = productItems.replaceAll(ELIMINATE_FORMAT, "");
@@ -93,5 +96,38 @@ public class StoreService {
         if (quantity > product.getTotalQuantity()) {
             throw new IllegalArgumentException(INVALID_QUANTITY);
         }
+    }
+
+    public Product findByNameProduct(String name) {
+        return ProductRepository.findByName(name);
+    }
+
+    public boolean isPromotion(String name) {
+        Promotion promotion = PromotionRepository.findByName(name);
+        if (promotion == null) {
+            return false;
+        }
+        LocalDate startDate = LocalDate.parse(promotion.getStartDate());
+        LocalDate endDate = LocalDate.parse(promotion.getEndDate());
+        LocalDateTime now = DateTimes.now();
+        LocalDate nowDate = now.toLocalDate();
+        return !nowDate.isBefore(startDate) && !nowDate.isAfter(endDate);
+    }
+
+    public int insufficientPromotionQuantity(int buyQuantity, Product product) {
+        int quantity = product.getQuantity(product.getPromotionName());
+        Promotion promotion = PromotionRepository.findByName(product.getPromotionName());
+        if (buyQuantity >= quantity) {
+            return quantity % (promotion.getBuy() + promotion.getGet()) + (buyQuantity - quantity);
+        }
+        return 0;
+    }
+
+    public int needPromotionQuantity(int buyQuantity, Product product) {
+        Promotion promotion = PromotionRepository.findByName(product.getPromotionName());
+        if (buyQuantity % (promotion.getBuy() + promotion.getGet()) == promotion.getBuy()) {
+            return promotion.getGet();
+        }
+        return 0;
     }
 }

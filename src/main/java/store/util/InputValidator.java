@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class InputValidator {
+    private static final List<String> ANSWER = List.of("Y", "N");
     private static final String ELIMINATE_FORMAT = "[\\[\\]]";
     private static final String PRODUCT_FORMAT = "^[가-힣0-9a-zA-Z]+-\\d+";
     private static final String INVALID_FORMAT = "올바르지 않은 형식으로 입력했습니다. 다시 입력해 주세요.";
@@ -47,5 +48,11 @@ public class InputValidator {
             throw new IllegalArgumentException(INVALID_INPUT);
         }
         names.add(name);
+    }
+
+    public static void validateAnswer(String input) {
+        if (!ANSWER.contains(input)) {
+            throw new IllegalArgumentException(INVALID_FORMAT);
+        }
     }
 }
